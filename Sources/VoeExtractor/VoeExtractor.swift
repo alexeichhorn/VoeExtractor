@@ -13,6 +13,19 @@ public class VoeExtractor {
     
     public class func extract(fromURL url: URL, completion: @escaping (URL?) -> Void) {
         
+        #if os(Linux)
+        
+        DispatchQueue.global(qos: .background).async {
+            guard let htmlContent = try? String(contentsOf: url, encoding: .utf8) else {
+                completion(nil)
+                return
+            }
+            
+            completion(extract(fromHTML: htmlContent))
+        }
+        
+        #else
+        
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data,
                   let htmlContent = String(data: data, encoding: .utf8) else {
@@ -24,6 +37,7 @@ public class VoeExtractor {
             
         }.resume()
         
+        #endif
     }
     
 }
