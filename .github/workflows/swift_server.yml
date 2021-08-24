@@ -1,0 +1,23 @@
+name: Swift Server
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-16.04]
+        tag: [5.3, 5.4]
+    
+    container:
+      image: swift:${{ matrix.tag }}
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build
+      run: swift build -v
+    - name: Run tests
+      run: swift test -v
