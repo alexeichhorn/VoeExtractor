@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, ubuntu-16.04]
-        tag: [5.3, 5.4, 5.5]
+        tag: [5.3, 5.4]
     
     container:
       image: swift:${{ matrix.tag }}
