@@ -19,7 +19,7 @@ final class VoeExtractorTests: XCTestCase {
     }
     
     func testUnavailableURL() {
-        let url = testSourceURL(URL(string: "https://voe.sx/e/8vi96tm5uufc")!)
+        let url = testSourceURL(URL(string: "https://voe.sx/e/8vi96tm5uufd")!)
         
         XCTAssertNil(url)
     }

@@ -10,7 +10,17 @@ public class VoeExtractor {
     /// - returns: video url when found
     public class func extract(fromHTML html: String) -> URL? {
         
-        return nil
+        let pattern = #"sources\s?=\s?\{[^(};)]*\"(?<url>http\S+.m3u8)\"[^(\};)]*\};"#
+        let regex = try? NSRegularExpression(pattern: pattern, options: [])
+        
+        guard let match = regex?.firstMatch(in: html, options: [], range: NSRange(location: 0, length: html.count)) else { return nil }
+        
+        let matchRange = match.range(at: 1)
+        guard let range = Range(matchRange, in: html) else { return nil }
+        
+        let videoURL = String(html[range])
+        
+        return URL(string: videoURL)
     }
     
     
