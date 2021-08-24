@@ -37,4 +37,11 @@ final class VoeExtractorTests: XCTestCase {
         
     }
     
+    
+    
+    static var allTests = [
+        ("testUnavailableURL", testUnavailableURL),
+        ("testBunnyVideo", testBunnyVideo),
+        ("testSourceDecoder", testSourceDecoder)
+    ]
 }
