@@ -1,7 +1,7 @@
 import Foundation
 #if os(Linux)
 import FoundationNetworking
-#else
+#endif
 
 public class VoeExtractor {
     
@@ -14,6 +14,9 @@ public class VoeExtractor {
     }
     
     
+    /// extracts direct video url or streaming manifest from standard voe url
+    /// - parameter url: voe url (e.g.: https://voe.sx/e/8vi96tm5uufc)
+    /// - parameter completion: called when result is found. returns video url
     public class func extract(fromURL url: URL, completion: @escaping (URL?) -> Void) {
         
         #if os(Linux)
