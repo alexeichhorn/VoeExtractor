@@ -10,4 +10,7 @@ VoeExtractor.extract(fromURL: url) { videoURL in
     // do stuff with retrieved videoURL
 }
 ```
-
+or using async/await:
+```swift
+let videoURL = await VoeExtractor.extract(fromURL: url)
+```
