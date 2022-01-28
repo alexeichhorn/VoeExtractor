@@ -62,7 +62,7 @@ public class VoeExtractor {
     /// extracts direct video url or streaming manifest from standard voe url
     /// - parameter url: voe url (e.g.: https://voe.sx/e/8vi96tm5uufc)
     /// - returns: video url, if found (else: nil)
-    @available(iOS 15.0, macOS 12.0, watchOS 8.0, tvOS 15.0, *)
+    @available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, *)
     public class func extract(fromURL url: URL) async -> URL? {
         await withCheckedContinuation { continuation in
             extract(fromURL: url) { videoURL in
