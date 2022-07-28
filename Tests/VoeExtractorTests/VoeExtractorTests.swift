@@ -3,6 +3,8 @@ import XCTest
 
 final class VoeExtractorTests: XCTestCase {
     
+#if !os(Linux)
+    
     func testSourceURLResult(_ videoURL: URL) -> Result<URL, Error> {
         
         let expectation = self.expectation(description: "extraction")
@@ -45,6 +47,8 @@ final class VoeExtractorTests: XCTestCase {
         
         print("extracted \(String(describing: url)) for bunny video")
     }
+    
+#endif
     
     func testHTMLExtraction() throws {
         let html = """
