@@ -1,5 +1,6 @@
 import XCTest
 @testable import VoeExtractor
+import URLSessionWrapper
 
 final class VoeExtractorTests: XCTestCase {
     
