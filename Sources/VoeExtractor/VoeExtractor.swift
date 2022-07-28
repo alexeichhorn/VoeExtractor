@@ -1,20 +1,32 @@
 import Foundation
+import URLSessionWrapper
 #if os(Linux)
 import FoundationNetworking
 #endif
 
 public enum VoeExtractionError: Error {
     case fileNotFound
+    case htmlDecodingError
     case unknown
 }
 
 public class VoeExtractor {
     
+    let urlSession: URLSessionWrapper
+    
+    #if !os(Linux)
+    public static let `default` = VoeExtractor(urlSession: .default)
+    #endif
+    
+    public init(urlSession: URLSessionWrapper) {
+        self.urlSession = urlSession
+    }
+    
     /// extracts direct video url or streaming manifest from raw html of embedded voe page
     /// - parameter html: HTML of video page on voe embedded frame
     /// - throws: VoeExtractionError
     /// - returns: video url when found
-    public class func extract(fromHTML html: String) throws -> URL {
+    public func extract(fromHTML html: String) throws -> URL {
         
         func extractError() -> VoeExtractionError {
             if html.lowercased().contains("file not found") {
@@ -42,36 +54,15 @@ public class VoeExtractor {
     /// extracts direct video url or streaming manifest from standard voe url
     /// - parameter url: voe url (e.g.: https://voe.sx/e/8vi96tm5uufc)
     /// - parameter completion: called when result is found. returns video url
-    public class func extract(fromURL url: URL, completion: @escaping (Result<URL, Error>) -> Void) {
-        
-        #if os(Linux)
-        
-        DispatchQueue.global(qos: .background).async {
+    public func extract(fromURL url: URL, completion: @escaping (Result<URL, Error>) -> Void) {
+        Task {
             do {
-                let htmlContent = try String(contentsOf: url, encoding: .utf8)
-                let videoURL = try extract(fromHTML: htmlContent)
+                let videoURL = try await extract(fromURL: url)
                 completion(.success(videoURL))
             } catch let error {
                 completion(.failure(error))
             }
         }
-        
-        #else
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data,
-                  let htmlContent = String(data: data, encoding: .utf8) else {
-                        completion(.failure(error ?? URLError(.unknown)))
-                        return
-                  }
-            
-            completion(Result {
-                try extract(fromHTML: htmlContent)
-            })
-            
-        }.resume()
-        
-        #endif
     }
     
     
@@ -81,12 +72,16 @@ public class VoeExtractor {
     /// - parameter url: voe url (e.g.: https://voe.sx/e/8vi96tm5uufc)
     /// - returns: video url, if found (else: nil)
     @available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, *)
-    public class func extract(fromURL url: URL) async throws -> URL {
-        try await withCheckedThrowingContinuation { continuation in
-            extract(fromURL: url) { result in
-                continuation.resume(with: result)
-            }
+    public func extract(fromURL url: URL) async throws -> URL {
+        
+        let request = URLSessionWrapper.Request(url: url)
+        let response = try await urlSession.handleRequest(request)
+        
+        guard let htmlContent = String(data: response.data, encoding: .utf8) else {
+            throw VoeExtractionError.htmlDecodingError
         }
+        
+        return try extract(fromHTML: htmlContent)
     }
     
     #endif

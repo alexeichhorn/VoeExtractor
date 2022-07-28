@@ -8,7 +8,7 @@ final class VoeExtractorTests: XCTestCase {
         let expectation = self.expectation(description: "extraction")
         var url: Result<URL, Error>?
         
-        VoeExtractor.extract(fromURL: videoURL) { videoURL in
+        VoeExtractor.default.extract(fromURL: videoURL) { videoURL in
             url = videoURL
             expectation.fulfill()
         }
@@ -79,17 +79,23 @@ final class VoeExtractorTests: XCTestCase {
         sources["mp4"] = uttf0(['0A', 'Xb', 'uY', '3L', 'hJ', 'nc', 't1', 'ma', '0I', '2c', 'lZ', 'XN', '0d', '3Z', 'zo', 'mc', 'vh', 'mZ', 'z8', 'me', '0U', 'XZ', 'zV', 'za', 'yU', 'Tc', 'wh', '2d', 'xJ', 'Xe', 'i5', 'We', 'zI', '3Y', '6N', '3Y', 'zM', 'Tc', 'xt', 'Gd', '41', 'mc', 'h9', 'mN', 'vQ', 'XZ', 'u5', 'ya', 'y9', '2d', '0V', 'mb', 'tU', '2b', '25', 'Se', '5l', 'Ga', 'hJ', 'WL', 'lR', '2b', 'u1', 'Se', 'yV', 'md', 'px', 'WZ', 'k9', 'yL', '6M', 'Hc', '0R', 'Ha']);
         """
         
-        let url = try VoeExtractor.extract(fromHTML: html)
+        let url = try VoeExtractor.default.extract(fromHTML: html)
         
         XCTAssertEqual(url, URL(string: "https://delivery-node-bahiyy.voe-network.net/hls/,6oarmxtkqq33cszcr3ynbyrqwhpq52k5seu4zo3fhorj3gwt5vesb4jmmrra,.urlset/master.m3u8")!)
     }
     
     
     
+    #if os(Linux)
+    static var allTests = [
+        ("testHTMLExtraction", testHTMLExtraction)
+    ]
+    #else
     static var allTests = [
         ("testUnavailableURL", testUnavailableURL),
         ("testIncorrectURL", testIncorrectURL),
         ("testBunnyVideo", testBunnyVideo),
         ("testHTMLExtraction", testHTMLExtraction)
     ]
+    #endif
 }

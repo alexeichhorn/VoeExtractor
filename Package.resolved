@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "URLSessionWrapper",
+        "repositoryURL": "https://github.com/alexeichhorn/URLSessionWrapper",
+        "state": {
+          "branch": "main",
+          "revision": "8df7b014ecd1b545f49287f02b3d88446c447b72",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
