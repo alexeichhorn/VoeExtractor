@@ -81,7 +81,7 @@ public class VoeExtractor {
     /// - parameter url: voe url (e.g.: https://voe.sx/e/8vi96tm5uufc)
     /// - returns: video url, if found (else: nil)
     @available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, *)
-    public class func extract(fromURL url: URL) async throws -> URL? {
+    public class func extract(fromURL url: URL) async throws -> URL {
         try await withCheckedThrowingContinuation { continuation in
             extract(fromURL: url) { result in
                 continuation.resume(with: result)
