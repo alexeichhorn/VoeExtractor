@@ -83,7 +83,11 @@ final class VoeExtractorTests: XCTestCase {
         sources["mp4"] = uttf0(['0A', 'Xb', 'uY', '3L', 'hJ', 'nc', 't1', 'ma', '0I', '2c', 'lZ', 'XN', '0d', '3Z', 'zo', 'mc', 'vh', 'mZ', 'z8', 'me', '0U', 'XZ', 'zV', 'za', 'yU', 'Tc', 'wh', '2d', 'xJ', 'Xe', 'i5', 'We', 'zI', '3Y', '6N', '3Y', 'zM', 'Tc', 'xt', 'Gd', '41', 'mc', 'h9', 'mN', 'vQ', 'XZ', 'u5', 'ya', 'y9', '2d', '0V', 'mb', 'tU', '2b', '25', 'Se', '5l', 'Ga', 'hJ', 'WL', 'lR', '2b', 'u1', 'Se', 'yV', 'md', 'px', 'WZ', 'k9', 'yL', '6M', 'Hc', '0R', 'Ha']);
         """
         
+        #if os(Linux)
+        let url = try VoeExtractor(urlSession: URLSessionWrapper { _ in fatalError() }).extract(fromHTML: html)
+        #else
         let url = try VoeExtractor.default.extract(fromHTML: html)
+        #endif
         
         XCTAssertEqual(url, URL(string: "https://delivery-node-bahiyy.voe-network.net/hls/,6oarmxtkqq33cszcr3ynbyrqwhpq52k5seu4zo3fhorj3gwt5vesb4jmmrra,.urlset/master.m3u8")!)
     }
