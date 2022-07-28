@@ -30,7 +30,11 @@ final class VoeExtractorTests: XCTestCase {
     
     func testIncorrectURL() {
         XCTAssertThrowsError(try testSourceURL(URL(string: "https://fakevoe.sx/e/8vi96tm5uufd")!)) { error in
+            #if os(Linux)
+            XCTAssertFalse(error is VoeExtractionError)
+            #else
             XCTAssert(error is URLError)
+            #endif
         }
     }
     
