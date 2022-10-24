@@ -29,18 +29,18 @@ public class VoeExtractor {
     public func extract(fromHTML html: String) throws -> URL {
         
         func extractError() -> VoeExtractionError {
-            if html.lowercased().contains("file not found") {
+            if html.lowercased().contains("file not found") || html.lowercased().contains("404 - not found") {
                 return .fileNotFound
             }
             return .unknown
         }
         
-        let pattern = #"sources\s?=\s?\{[^(};)]*\"(?<url>http\S+.m3u8)\"[^(\};)]*\};"#
+        let pattern = #"sources\s?=\s?\{[^(};)]*(\"|')(?<url>http\S+.m3u8(\?\S+)?)(\"|')[^(\};)]*\};"#
         let regex = try? NSRegularExpression(pattern: pattern, options: [])
         
         guard let match = regex?.firstMatch(in: html, options: [], range: NSRange(location: 0, length: html.count)) else { throw extractError() }
         
-        let matchRange = match.range(at: 1)
+        let matchRange = match.range(at: 2)
         guard let range = Range(matchRange, in: html) else { throw extractError() }
         
         if let videoURL = URL(string: String(html[range])) {
@@ -77,6 +77,11 @@ public class VoeExtractor {
         let request = URLSessionWrapper.Request(url: url)
         let response = try await urlSession.handleRequest(request)
         
+        if response.statusCode == 404 {
+            throw VoeExtractionError.fileNotFound
+        }
+        
+        print(response.statusCode)
         guard let htmlContent = String(data: response.data, encoding: .utf8) else {
             throw VoeExtractionError.htmlDecodingError
         }
