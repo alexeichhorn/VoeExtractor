@@ -35,7 +35,8 @@ public class VoeExtractor {
             return .unknown
         }
         
-        let pattern = #"sources\s?=\s?\{[^(};)]*(\"|')(?<url>http\S+.m3u8(\?\S+)?)(\"|')[^(\};)]*\};"#
+        //let pattern = #"sources\s?=\s?\{[^(};)]*(\"|')(?<url>http\S+.m3u8(\?\S+)?)(\"|')[^(\};)]*\};"#
+        let pattern = #"(\"|')(?<url>http\S+.m3u8(\?\S+)?)(\"|')"#
         let regex = try? NSRegularExpression(pattern: pattern, options: [])
         
         guard let match = regex?.firstMatch(in: html, options: [], range: NSRange(location: 0, length: html.count)) else { throw extractError() }
