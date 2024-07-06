@@ -66,6 +66,41 @@ public class VoeExtractor {
         }
     }
     
+    private func loadPageHTML(fromURL url: URL) async throws -> String {
+        
+        let request = URLSessionWrapper.Request(url: url)
+        let response = try await urlSession.handleRequest(request)
+        
+        if response.statusCode == 404 {
+            throw VoeExtractionError.fileNotFound
+        }
+        
+        //print(response.statusCode)
+        guard let htmlContent = String(data: response.data, encoding: .utf8) else {
+            throw VoeExtractionError.htmlDecodingError
+        }
+        
+        return htmlContent
+    }
+    
+    /// Find javascript `window.location.href`-style redirect
+    /// - returns: nil if not found
+    private func findRedirectURL(html: String) -> URL? {
+        
+        let pattern = #"window\.location\.href = ('|")(?<url>https\S+)('|")"#
+        let regex = try? NSRegularExpression(pattern: pattern, options: [])
+        
+        guard let match = regex?.firstMatch(in: html, options: [], range: NSRange(location: 0, length: html.count)) else { return nil }
+        
+        let matchRange = match.range(at: 2)
+        guard let range = Range(matchRange, in: html) else { return nil }
+        
+        if let redirectURL = URL(string: String(html[range])) {
+            return redirectURL
+        } else {
+            return nil
+        }
+    }
     
     #if swift(>=5.5)
     
@@ -75,19 +110,20 @@ public class VoeExtractor {
     @available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, *)
     public func extract(fromURL url: URL) async throws -> URL {
         
-        let request = URLSessionWrapper.Request(url: url)
-        let response = try await urlSession.handleRequest(request)
+        let htmlContent = try await loadPageHTML(fromURL: url)
         
-        if response.statusCode == 404 {
-            throw VoeExtractionError.fileNotFound
+        do {
+            return try extract(fromHTML: htmlContent)
+        } catch let error {
+            
+            // see if there is a redirect inside
+            if let redirectURL = findRedirectURL(html: htmlContent) {
+                let htmlContent = try await loadPageHTML(fromURL: redirectURL) // redo steps (instead of recursive style) to prevent infinite loop
+                return try extract(fromHTML: htmlContent)
+            } else {
+                throw error
+            }
         }
-        
-        print(response.statusCode)
-        guard let htmlContent = String(data: response.data, encoding: .utf8) else {
-            throw VoeExtractionError.htmlDecodingError
-        }
-        
-        return try extract(fromHTML: htmlContent)
     }
     
     #endif

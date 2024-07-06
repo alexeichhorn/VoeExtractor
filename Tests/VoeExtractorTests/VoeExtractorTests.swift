@@ -42,7 +42,7 @@ final class VoeExtractorTests: XCTestCase {
     }
     
     func testBunnyVideo() throws {
-        let url = try testSourceURL(URL(string: "https://voe.sx/8aq9eb4tcakx")!) // TODO: upload own video
+        let url = try testSourceURL(URL(string: "https://voe.sx/0yobz5vmro7j")!) // TODO: upload own video
         
         XCTAssertEqual(url.pathExtension, "m3u8")
         
