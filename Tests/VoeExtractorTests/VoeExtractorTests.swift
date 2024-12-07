@@ -69,9 +69,9 @@ final class VoeExtractorTests: XCTestCase {
                 seek: true
             },
         });
-        const sources = {
-            "hls": "https://delivery-node-bahiyy.voe-network.net/hls/,6oarmxtkqq33cszcr3ynbyrqwhpq52k5seu4zo3fhorj3gwt5vesb4jmmrra,.urlset/master.m3u8",
-            "video_height": 720,
+        var sources = {
+            'hls': 'aHR0cHM6Ly9kZWxpdmVyeS1ub2RlLXpuajZva2p3MTZtbzhjY2wudm9lLW5ldHdvcmsubmV0L2VuZ2luZS9obHMyL3JlZGFjdGVkMzM=',
+            'video_height': 720,
         };
         var hls_config = {
             maxMaxBufferLength: 600,
@@ -90,7 +90,7 @@ final class VoeExtractorTests: XCTestCase {
         let url = try VoeExtractor.default.extract(fromHTML: html)
         #endif
         
-        XCTAssertEqual(url, URL(string: "https://delivery-node-bahiyy.voe-network.net/hls/,6oarmxtkqq33cszcr3ynbyrqwhpq52k5seu4zo3fhorj3gwt5vesb4jmmrra,.urlset/master.m3u8")!)
+        XCTAssertEqual(url, URL(string: "https://delivery-node-znj6okjw16mo8ccl.voe-network.net/engine/hls2/redacted33")!)
     }
     
     

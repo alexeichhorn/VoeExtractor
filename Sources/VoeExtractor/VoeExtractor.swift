@@ -35,26 +35,32 @@ public class VoeExtractor {
             return .unknown
         }
         
-        //let pattern = #"sources\s?=\s?\{[^(};)]*(\"|')(?<url>http\S+.m3u8(\?\S+)?)(\"|')[^(\};)]*\};"#
-        let pattern = #"(\"|')(?<url>http\S+.m3u8(\?\S+)?)(\"|')"#
-        let regex = try? NSRegularExpression(pattern: pattern, options: [])
+        // Updated pattern to match base64 encoded HLS URL in 'sources' variable
+        let pattern = #"sources\s*=\s*\{.*?('|")hls\1\s*:\s*(["'])(?<base64>[^"']+)\2"#
+        let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
         
-        guard let match = regex?.firstMatch(in: html, options: [], range: NSRange(location: 0, length: html.count)) else { throw extractError() }
+        guard let match = regex?.firstMatch(in: html, options: [], range: NSRange(location: 0, length: html.utf16.count)) else {
+            throw extractError()
+        }
         
-        let matchRange = match.range(at: 2)
-        guard let range = Range(matchRange, in: html) else { throw extractError() }
+        let matchRange = match.range(withName: "base64")
+        guard let base64Range = Range(matchRange, in: html) else {
+            throw extractError()
+        }
         
-        if let videoURL = URL(string: String(html[range])) {
+        let base64String = String(html[base64Range])
+        
+        // Decode the base64 string to get the video URL
+        if let data = Data(base64Encoded: base64String), let videoURLString = String(data: data, encoding: .utf8), let videoURL = URL(string: videoURLString) {
             return videoURL
         } else {
             throw VoeExtractionError.unknown
         }
     }
     
-    
-    /// extracts direct video url or streaming manifest from standard voe url
-    /// - parameter url: voe url (e.g.: https://voe.sx/e/8vi96tm5uufc)
-    /// - parameter completion: called when result is found. returns video url
+    /// Extracts direct video URL or streaming manifest from a standard VOE URL
+    /// - parameter url: VOE URL (e.g., https://voe.sx/e/8vi96tm5uufc)
+    /// - parameter completion: called when result is found. Returns video URL
     public func extract(fromURL url: URL, completion: @escaping (Result<URL, Error>) -> Void) {
         Task {
             do {
